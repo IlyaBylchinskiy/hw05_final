@@ -20,3 +20,12 @@ posts/static/
 media/
 
 db.sqlite3
+
+static/
+posts/static/
+users/static
+
+db.sqlite3media
+
+media/posts/test_*
+media/cache/
