@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Профиль пользователя{% endblock %}
+{% block content %}
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-3 mb-3 mt-1">
+            <div class="card">
+                {% include "posts/card_profile.html" with user_profile=user_profile posts_count=posts_count %}
+            </div>
+        </div>
+        <div class="col-md-9">                
+            {% for post in page %}
+                {% include "posts/card_post.html" with username=username post=post user_profile=user_profile %}
+            {% endfor %}
+            {% if page.has_other_pages %}
+                {% include "paginator.html" with items=page paginator=paginator %}
+            {% endif %}
+
+        </div>
+    </div>
+</main>
+{% endblock content %}

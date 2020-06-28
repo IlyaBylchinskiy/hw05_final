@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Пост{% endblock %}
+{% block content %}
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-3 mb-3 mt-1">
+            <div class="card">
+                {% include "posts/card_profile.html" with user_profile=user_profile posts_count=posts_count following=following %}
+            </div>
+        </div>
+        <div class="col-md-9">
+            {% include "posts/card_post.html" with username=username post=post user_profile=user_profile %}
+            <a name="comments">
+            {% include "posts/comments.html" with items=items %}
+            </a>
+        </div>
+    </div>
+</main>
+{% endblock content %}
