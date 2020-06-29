@@ -8,7 +8,7 @@ from posts.models import Follow, Post
 User = get_user_model()
 
 
-class posts_test(TestCase):
+class TestFinal(TestCase):
 
     def setUp(self):
         self.client = Client()
@@ -78,7 +78,7 @@ class posts_test(TestCase):
         response = self.response_get(name='follow_index')
         self.assertNotIn(post, response.context['paginator'].object_list)
 
-    def test_authcomments(self):
+    def test_auth_comments(self):
         """ Только авторизованный пользователь может комментировать посты.
         """
         post = Post.objects.create(author=self.user, text=self.text)

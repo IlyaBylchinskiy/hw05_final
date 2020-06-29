@@ -9,7 +9,7 @@ from posts.models import Group, Post
 User = get_user_model()
 
 
-class posts_test(TestCase):
+class TestImgCache(TestCase):
 
     def setUp(self):
         self.client = Client()

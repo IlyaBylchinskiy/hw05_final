@@ -8,7 +8,7 @@
 
         <h1> Последние обновления на сайте</h1>
         {% load cache %}
-        {% cache 20 page %}
+        {% cache 5 page %}
         {% for post in page %}
             {% include "posts/card_post.html" with post=post %}
         {% endfor %}
