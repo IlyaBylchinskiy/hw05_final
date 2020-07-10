@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from taggit.models import Tag
 
 from .forms import CommentForm, PostForm
 from .models import Follow, Group, Post
@@ -10,9 +11,12 @@ from .models import Follow, Group, Post
 User = get_user_model()
 
 
-def index(request):
-    post_list = Post.objects.all()
-    paginator = Paginator(post_list, 10)
+def index(request, tag_slug=None):
+    posts_list = Post.objects.all()
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        posts_list = posts_list.filter(tags__in=[tag])
+    paginator = Paginator(posts_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
 
@@ -61,7 +65,6 @@ def profile(request, username):
 
     user = request.user
     following = user.is_authenticated and user_profile.following.exists()
-
     return render(
         request, 'posts/profile.html',
         {
@@ -195,5 +198,5 @@ def profile_follow(request, username):
 @login_required
 def profile_unfollow(request, username):
     user = request.user
-    Follow.objects.get(user=user, author__username=username).delete() 
+    Follow.objects.get(user=user, author__username=username).delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

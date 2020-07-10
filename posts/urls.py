@@ -29,5 +29,8 @@ urlpatterns = [
         '<str:username>/unfollow/',
         views.profile_unfollow,
         name='profile_unfollow'
-    )
+    ),
+    path('tag/<slug:tag_slug>/',
+        views.index,
+        name='posts_list_tagged'),
 ]

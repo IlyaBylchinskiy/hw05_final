@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from taggit.managers import TaggableManager
 
 User = get_user_model()
 
@@ -21,6 +22,7 @@ class Post(models.Model):
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, blank=True,
                               null=True, related_name='posts')
     image = models.ImageField(upload_to='posts/', blank=True, null=True)
+    tags = TaggableManager()
 
     def __str__(self):
         return f'{self.text[:50]} - {self.pub_date}'

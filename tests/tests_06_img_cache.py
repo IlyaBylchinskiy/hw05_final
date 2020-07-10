@@ -106,6 +106,7 @@ class TestImgCache(TestCase):
                       'загрузили, поврежден или не является изображением.')
         self.assertFormError(response, 'form', 'image', error_text)
 
+
     def test_cache(self):
         """ Проверка работы кэширования главной страницы. """
         response_before = self.response_get(
