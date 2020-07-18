@@ -1,4 +1,9 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ip_address = os.getenv('IP_ADDRESS')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -7,8 +12,8 @@ SECRET_KEY = ')g737c(ljo)e!zd126a+n&h*idcim_l)mlx8)eiilab^wr-w=s'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '83.220.169.127',
-    '127.0.0.1',
+    ip_address,
+    #'127.0.0.1',
     'testserver',
     ]
 
@@ -40,8 +45,8 @@ MIDDLEWARE = [
 ]
 
 INTERNAL_IPS = [
-    '127.0.0.1',
-    '83.220.169.127',
+    #'127.0.0.1',
+    ip_address
 ]
 ROOT_URLCONF = 'yatube.urls'
 

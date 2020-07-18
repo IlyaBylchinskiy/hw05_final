@@ -33,3 +33,6 @@ media/cache/
 .vscode/
 
 db.json
+
+.env
+
