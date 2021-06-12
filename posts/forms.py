@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.auth import get_user_model
 
 from .models import Comment, Post
-from taggit.forms import TagField
 
 User = get_user_model()
 

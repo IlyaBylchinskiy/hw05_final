@@ -81,8 +81,8 @@ def post_view(request, username, post_id):
     comments = post.comments.all()
     form = CommentForm()
     following = (
-        request.user.is_authenticated and
-        post.author.following.filter(user=request.user).exists()
+        request.user.is_authenticated
+        and post.author.following.filter(user=request.user).exists()
     )
     return render(
         request,
