@@ -1,0 +1,133 @@
+
+name: blog
+
+on: [push]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [ '3.8' ]
+
+    steps:
+    -
+        uses: actions/checkout@v2
+    -
+        name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+            python-version: ${{ matrix.python-version }}
+    -
+        name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+    -
+        name: Lint with flake8
+        run: flake8 .
+    -
+        name: Test with pytest
+        run: pytest
+
+  build_and_push_to_docker_hub:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
+
+    steps:
+      -
+        name: Check out the repo
+        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Login to Docker
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      -
+        name: Push to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: sorochinskii/blog:latest
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
+    needs: build_and_push_to_docker_hub
+
+    steps:
+      -
+        uses: actions/checkout@v2
+      -
+        name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+            python-version: 3.8
+      -
+        name: Install dump-env and create .env
+        env:
+          SECRET_DB_ENGINE: ${{ secrets.DB_ENGINE }}
+          SECRET_DB_NAME: ${{ secrets.DB_NAME }}
+          SECRET_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          SECRET_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SECRET_DB_HOST: ${{ secrets.DB_HOST }}
+          SECRET_DB_PORT: ${{ secrets.DB_PORT }}
+          SECRET_EMAIL_USE_TLS: ${{ secrets.EMAIL_USE_TLS }}
+          SECRET_EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+          SECRET_EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+          SECRET_EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+          SECRET_EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+          SECRET_IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
+          SECRET_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install dump-env==1.2.0
+          dump-env --template=.env.example --prefix='SECRET_' > .env
+      -
+        name: Copy file via ssh password
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: './.env, nginx/default.conf, ./docker-compose.yml'
+          target: '/home/dev/code'
+      -
+        name: Executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            cd ~
+            cd ./code
+            docker-compose down
+            docker rmi sorochinskii/blog -f
+            docker pull sorochinskii/blog:latest
+            docker-compose up -d
+
+  send_message:
+    name: Send message
+    runs-on: ubuntu-latest
+    needs: deploy
+
+    steps:
+      -
+        name: send message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ${{ github.workflow }} успешно выполнен!
