@@ -20,3 +20,16 @@ sqlparse==0.3.0           # via django
 urllib3==1.25.6           # via requests
 wcwidth==0.1.8            # via pytest
 zipp==2.2.0               # via importlib-metadata
+gunicorn==20.0.4
+django-environ==0.4.5
+flake8==3.8.4
+Pillow==8.0.1
+psycopg2-binary==2.8.6
+pycodestyle==2.6.0
+pyflakes==2.2.0
+python-env==1.0.0
+pytz==2020.5
+six==1.15.0
+sorl-thumbnail==12.7.0
+sqlparse==0.4.1
+django-environ==0.4.5
