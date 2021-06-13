@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD gunicorn yatube.wsgi:application --bind 0.0.0.0:8000y
+CMD gunicorn yatube.wsgi:application --bind 0.0.0.0:8000
